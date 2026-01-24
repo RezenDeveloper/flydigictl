@@ -72,38 +72,56 @@ func (c *JoystickConfiguration) ApplyTo(bean *config.JoyStickBean) {
 }
 
 func ConvertTriggerConfiguration(bean *config.Trigger) *TriggerConfiguration {
+	var mode isTriggerConfiguration_Mode
+
+	switch bean.AutoTrigger.Mode {
+	case 0:
+		mode = &TriggerConfiguration_Default{}
+	case 1:
+		mode = &TriggerConfiguration_Race{
+			Race: &TriggerRace{
+				InitialPos: bean.AutoTrigger.MixedParams[0],
+				Pressure:   bean.AutoTrigger.MixedParams[1],
+			},
+		}
+	case 2:
+		mode = &TriggerConfiguration_Recoil{
+			Recoil: &TriggerRecoil{
+				InitialPos:      bean.AutoTrigger.MixedParams[0],
+				InitialStrength: bean.AutoTrigger.MixedParams[1],
+				Intensity:       bean.AutoTrigger.MixedParams[2],
+				Frequency:       bean.AutoTrigger.MixedParams[3],
+				InputAfter:      bean.AutoTrigger.MixedParams[4] == 1,
+			},
+		}
+	case 3:
+		mode = &TriggerConfiguration_Sniper{
+			Sniper: &TriggerSniper{
+				InitialPos: bean.AutoTrigger.MixedParams[0],
+				Length:     bean.AutoTrigger.MixedParams[1],
+				Pressure:   bean.AutoTrigger.MixedParams[2],
+				InputAfter: bean.AutoTrigger.MixedParams[4] == 1,
+			},
+		}
+	case 4:
+		mode = &TriggerConfiguration_Lock{
+			Lock: &TriggerLock{
+				InitialPos: bean.AutoTrigger.MixedParams[0],
+			},
+		}
+	case 5:
+		mode = &TriggerConfiguration_Vibration{
+			Vibration: &TriggerVibration{
+				Coefficient: bean.AutoTrigger.VibrationBind.Scale,
+				Threshold:   bean.AutoTrigger.VibrationBind.MinFilter,
+				TravelRange: bean.AutoTrigger.VibrationBind.TriggerParams[0],
+				Frequency:   bean.AutoTrigger.VibrationBind.TriggerParams[3],
+			},
+		}
+	}
+
 	return &TriggerConfiguration{
-		AutoTrigger: &AutoTrigger{
-			Mode: bean.AutoTrigger.Mode,
-			VibrationBind: &VibrationBind{
-				Type:          bean.AutoTrigger.VibrationBind.Type,
-				MinFilter:     bean.AutoTrigger.VibrationBind.MinFilter,
-				Scale:         bean.AutoTrigger.VibrationBind.Scale,
-				TriggerParams: bean.AutoTrigger.VibrationBind.TriggerParams,
-			},
-			MixedBorder: bean.AutoTrigger.MixedBorder,
-			MixedParams: bean.AutoTrigger.MixedParams,
-		},
-		TriggerMotor: &TriggerMotor{
-			LineGear: &TriggerMotorSet{
-				Type:      bean.TriggerMotor.LineGear.Type,
-				Min:       bean.TriggerMotor.LineGear.Min,
-				Max:       bean.TriggerMotor.LineGear.Max,
-				Filter:    bean.TriggerMotor.LineGear.Filter,
-				VibrLimit: bean.TriggerMotor.LineGear.Vibrlimit,
-				Scale:     bean.TriggerMotor.LineGear.Scale,
-				TimeLimit: bean.TriggerMotor.LineGear.TimeLimit,
-			},
-			MicrGear: &TriggerMotorSet{
-				Type:      bean.TriggerMotor.MicrGear.Type,
-				Min:       bean.TriggerMotor.MicrGear.Min,
-				Max:       bean.TriggerMotor.MicrGear.Max,
-				Filter:    bean.TriggerMotor.MicrGear.Filter,
-				VibrLimit: bean.TriggerMotor.MicrGear.Vibrlimit,
-				Scale:     bean.TriggerMotor.MicrGear.Scale,
-				TimeLimit: bean.TriggerMotor.MicrGear.TimeLimit,
-			},
-		},
+		Mode: mode,
 	}
 }
 
@@ -112,37 +130,27 @@ func (c *TriggerConfiguration) ApplyTo(bean *config.Trigger) {
 		return
 	}
 
-	bean.Type = 0
-	bean.AutoTrigger = &config.Autotrigger{
-		Mode: c.AutoTrigger.Mode,
-		VibrationBind: &config.Vibrationbind{
-			Type:          c.AutoTrigger.VibrationBind.Type,
-			MinFilter:     c.AutoTrigger.VibrationBind.MinFilter,
-			Scale:         c.AutoTrigger.VibrationBind.Scale,
-			TriggerParams: c.AutoTrigger.VibrationBind.TriggerParams,
-		},
-		MixedBorder: c.AutoTrigger.MixedBorder,
-		MixedParams: c.AutoTrigger.MixedParams,
-	}
-	bean.TriggerMotor = &config.TriggerMotor{
-		LineGear: &config.TriggerMotorSet{
-			Type:      c.TriggerMotor.LineGear.Type,
-			Min:       c.TriggerMotor.LineGear.Min,
-			Max:       c.TriggerMotor.LineGear.Max,
-			Filter:    c.TriggerMotor.LineGear.Filter,
-			Vibrlimit: c.TriggerMotor.LineGear.VibrLimit,
-			Scale:     c.TriggerMotor.LineGear.Scale,
-			TimeLimit: c.TriggerMotor.LineGear.TimeLimit,
-		},
-		MicrGear: &config.TriggerMotorSet{
-			Type:      c.TriggerMotor.MicrGear.Type,
-			Min:       c.TriggerMotor.MicrGear.Min,
-			Max:       c.TriggerMotor.MicrGear.Max,
-			Filter:    c.TriggerMotor.MicrGear.Filter,
-			Vibrlimit: c.TriggerMotor.MicrGear.VibrLimit,
-			Scale:     c.TriggerMotor.MicrGear.Scale,
-			TimeLimit: c.TriggerMotor.MicrGear.TimeLimit,
-		},
+	switch mode := c.Mode.(type) {
+	case *TriggerConfiguration_Default:
+		bean.ApplyDefaultTrigger()
+	case *TriggerConfiguration_Race:
+		bean.ApplyRaceTrigger(mode.Race.InitialPos, mode.Race.Pressure)
+	case *TriggerConfiguration_Recoil:
+		outputInt := int32(0)
+		if mode.Recoil.InputAfter {
+			outputInt = 1
+		}
+		bean.ApplyRecoilTrigger(mode.Recoil.InitialPos, mode.Recoil.InitialStrength, mode.Recoil.Intensity, mode.Recoil.Frequency, outputInt)
+	case *TriggerConfiguration_Sniper:
+		outputInt := int32(0)
+		if mode.Sniper.InputAfter {
+			outputInt = 1
+		}
+		bean.ApplySniperTrigger(mode.Sniper.InitialPos, mode.Sniper.Length, mode.Sniper.Pressure, outputInt)
+	case *TriggerConfiguration_Lock:
+		bean.ApplyLockTrigger(mode.Lock.InitialPos)
+	case *TriggerConfiguration_Vibration:
+		bean.ApplyVibrationTrigger(mode.Vibration.Coefficient, mode.Vibration.Threshold, mode.Vibration.TravelRange, mode.Vibration.Frequency)
 	}
 }
 

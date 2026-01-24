@@ -309,7 +309,7 @@ func (t *Trigger) ApplyDefaultTrigger() {
 	lg.TimeLimit = 0
 }
 
-func (t *Trigger) ApplyRaceTrigger() {
+func (t *Trigger) ApplyRaceTrigger(initialPos int32, pressure int32) {
 	t.Type = 0
 	t.AutoTrigger.Mode = 1
 	t.AutoTrigger.VibrationBind.TriggerParams = []int32{100, 1, 255, 70, 0}
@@ -317,7 +317,9 @@ func (t *Trigger) ApplyRaceTrigger() {
 	for i := range t.AutoTrigger.MixedParams {
 		t.AutoTrigger.MixedParams[i] = 0
 	}
-	t.AutoTrigger.MixedParams[1] = 30
+
+	t.AutoTrigger.MixedParams[0] = int32(initialPos)
+	t.AutoTrigger.MixedParams[1] = int32(pressure)
 
 	lg := t.TriggerMotor.LineGear
 	lg.Type = 1
@@ -329,32 +331,7 @@ func (t *Trigger) ApplyRaceTrigger() {
 	lg.TimeLimit = 0
 }
 
-func (t *Trigger) ApplySniperTrigger() {
-	t.Type = 0
-	t.AutoTrigger.Mode = 3
-	t.AutoTrigger.VibrationBind.Type = 0
-	t.AutoTrigger.VibrationBind.MinFilter = 10
-	t.AutoTrigger.VibrationBind.Scale = 50
-	t.AutoTrigger.VibrationBind.TriggerParams =
-		[]int32{100, 1, 255, 70, 0}
-
-	t.AutoTrigger.MixedBorder = 0
-	t.AutoTrigger.MixedParams = []int32{
-		50, 30, 1, 0, 1,
-		0, 0, 0, 0, 0,
-	}
-
-	lg := t.TriggerMotor.LineGear
-	lg.Type = 1
-	lg.Min = 30
-	lg.Max = 80
-	lg.Filter = 5
-	lg.Vibrlimit = 1
-	lg.Scale = 50
-	lg.TimeLimit = 0
-}
-
-func (t *Trigger) ApplyRecoilTrigger() {
+func (t *Trigger) ApplyRecoilTrigger(InitialPos int32, InitialStrength int32, Intensity int32, Frequency int32, OutputFromVibration int32) {
 	t.Type = 0
 	t.AutoTrigger.Mode = 2
 	t.AutoTrigger.VibrationBind.Type = 0
@@ -365,7 +342,7 @@ func (t *Trigger) ApplyRecoilTrigger() {
 
 	t.AutoTrigger.MixedBorder = 0
 	t.AutoTrigger.MixedParams = []int32{
-		0, 1, 50, 15, 1,
+		InitialPos, InitialStrength, Intensity, Frequency, OutputFromVibration,
 		0, 0, 0, 0, 0,
 	}
 
@@ -379,7 +356,32 @@ func (t *Trigger) ApplyRecoilTrigger() {
 	lg.TimeLimit = 0
 }
 
-func (t *Trigger) ApplyLockTrigger() {
+func (t *Trigger) ApplySniperTrigger(InitialPos int32, Length int32, Pressure int32, OutputFromVibration int32) {
+	t.Type = 0
+	t.AutoTrigger.Mode = 3
+	t.AutoTrigger.VibrationBind.Type = 0
+	t.AutoTrigger.VibrationBind.MinFilter = 10
+	t.AutoTrigger.VibrationBind.Scale = 50
+	t.AutoTrigger.VibrationBind.TriggerParams =
+		[]int32{100, 1, 255, 70, 0}
+
+	t.AutoTrigger.MixedBorder = 0
+	t.AutoTrigger.MixedParams = []int32{
+		InitialPos, Length, Pressure, 0, OutputFromVibration,
+		0, 0, 0, 0, 0,
+	}
+
+	lg := t.TriggerMotor.LineGear
+	lg.Type = 1
+	lg.Min = 30
+	lg.Max = 80
+	lg.Filter = 5
+	lg.Vibrlimit = 1
+	lg.Scale = 50
+	lg.TimeLimit = 0
+}
+
+func (t *Trigger) ApplyLockTrigger(InitialPos int32) {
 	t.Type = 0
 	t.AutoTrigger.Mode = 4
 	t.AutoTrigger.VibrationBind.Type = 0
@@ -390,7 +392,7 @@ func (t *Trigger) ApplyLockTrigger() {
 
 	t.AutoTrigger.MixedBorder = 0
 	t.AutoTrigger.MixedParams = []int32{
-		40, 250, 1, 0, 0,
+		InitialPos, 250, 1, 0, 0,
 		0, 0, 0, 0, 0,
 	}
 
@@ -404,14 +406,14 @@ func (t *Trigger) ApplyLockTrigger() {
 	lg.TimeLimit = 0
 }
 
-func (t *Trigger) ApplyVibrationTrigger() {
+func (t *Trigger) ApplyVibrationTrigger(Coefficient int32, Threshold int32, TravelRange int32, Frequency int32) {
 	t.Type = 0
 	t.AutoTrigger.Mode = 5
 	t.AutoTrigger.VibrationBind.Type = 2
-	t.AutoTrigger.VibrationBind.MinFilter = 10
-	t.AutoTrigger.VibrationBind.Scale = 50
+	t.AutoTrigger.VibrationBind.Scale = Coefficient
+	t.AutoTrigger.VibrationBind.MinFilter = Threshold
 	t.AutoTrigger.VibrationBind.TriggerParams =
-		[]int32{1, 1, 1, 90, 0}
+		[]int32{TravelRange, 1, 1, Frequency, 0}
 
 	t.AutoTrigger.MixedBorder = 0
 	t.AutoTrigger.MixedParams = []int32{

@@ -258,85 +258,24 @@ func (x *JoystickConfiguration) GetDeadzone() int32 {
 	return 0
 }
 
-type VibrationBind struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          int32                  `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`
-	MinFilter     int32                  `protobuf:"varint,2,opt,name=minFilter,proto3" json:"minFilter,omitempty"`
-	Scale         int32                  `protobuf:"varint,3,opt,name=scale,proto3" json:"scale,omitempty"`
-	TriggerParams []int32                `protobuf:"varint,4,rep,packed,name=triggerParams,proto3" json:"triggerParams,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VibrationBind) Reset() {
-	*x = VibrationBind{}
-	mi := &file_flydigi_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VibrationBind) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VibrationBind) ProtoMessage() {}
-
-func (x *VibrationBind) ProtoReflect() protoreflect.Message {
-	mi := &file_flydigi_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VibrationBind.ProtoReflect.Descriptor instead.
-func (*VibrationBind) Descriptor() ([]byte, []int) {
-	return file_flydigi_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *VibrationBind) GetType() int32 {
-	if x != nil {
-		return x.Type
-	}
-	return 0
-}
-
-func (x *VibrationBind) GetMinFilter() int32 {
-	if x != nil {
-		return x.MinFilter
-	}
-	return 0
-}
-
-func (x *VibrationBind) GetScale() int32 {
-	if x != nil {
-		return x.Scale
-	}
-	return 0
-}
-
-func (x *VibrationBind) GetTriggerParams() []int32 {
-	if x != nil {
-		return x.TriggerParams
-	}
-	return nil
-}
-
 type TriggerConfiguration struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AutoTrigger   *AutoTrigger           `protobuf:"bytes,1,opt,name=autoTrigger,proto3" json:"autoTrigger,omitempty"`
-	TriggerMotor  *TriggerMotor          `protobuf:"bytes,2,opt,name=triggerMotor,proto3" json:"triggerMotor,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Mode:
+	//
+	//	*TriggerConfiguration_Default
+	//	*TriggerConfiguration_Race
+	//	*TriggerConfiguration_Recoil
+	//	*TriggerConfiguration_Sniper
+	//	*TriggerConfiguration_Lock
+	//	*TriggerConfiguration_Vibration
+	Mode          isTriggerConfiguration_Mode `protobuf_oneof:"mode"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *TriggerConfiguration) Reset() {
 	*x = TriggerConfiguration{}
-	mi := &file_flydigi_proto_msgTypes[4]
+	mi := &file_flydigi_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -348,7 +287,7 @@ func (x *TriggerConfiguration) String() string {
 func (*TriggerConfiguration) ProtoMessage() {}
 
 func (x *TriggerConfiguration) ProtoReflect() protoreflect.Message {
-	mi := &file_flydigi_proto_msgTypes[4]
+	mi := &file_flydigi_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -361,113 +300,223 @@ func (x *TriggerConfiguration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TriggerConfiguration.ProtoReflect.Descriptor instead.
 func (*TriggerConfiguration) Descriptor() ([]byte, []int) {
-	return file_flydigi_proto_rawDescGZIP(), []int{4}
+	return file_flydigi_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *TriggerConfiguration) GetAutoTrigger() *AutoTrigger {
-	if x != nil {
-		return x.AutoTrigger
-	}
-	return nil
-}
-
-func (x *TriggerConfiguration) GetTriggerMotor() *TriggerMotor {
-	if x != nil {
-		return x.TriggerMotor
-	}
-	return nil
-}
-
-type AutoTrigger struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Mode          int32                  `protobuf:"varint,1,opt,name=mode,proto3" json:"mode,omitempty"`
-	VibrationBind *VibrationBind         `protobuf:"bytes,2,opt,name=vibrationBind,proto3" json:"vibrationBind,omitempty"`
-	MixedBorder   int32                  `protobuf:"varint,3,opt,name=mixedBorder,proto3" json:"mixedBorder,omitempty"`
-	MixedParams   []int32                `protobuf:"varint,4,rep,packed,name=mixedParams,proto3" json:"mixedParams,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AutoTrigger) Reset() {
-	*x = AutoTrigger{}
-	mi := &file_flydigi_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AutoTrigger) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AutoTrigger) ProtoMessage() {}
-
-func (x *AutoTrigger) ProtoReflect() protoreflect.Message {
-	mi := &file_flydigi_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AutoTrigger.ProtoReflect.Descriptor instead.
-func (*AutoTrigger) Descriptor() ([]byte, []int) {
-	return file_flydigi_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *AutoTrigger) GetMode() int32 {
+func (x *TriggerConfiguration) GetMode() isTriggerConfiguration_Mode {
 	if x != nil {
 		return x.Mode
 	}
-	return 0
+	return nil
 }
 
-func (x *AutoTrigger) GetVibrationBind() *VibrationBind {
+func (x *TriggerConfiguration) GetDefault() *TriggerDefault {
 	if x != nil {
-		return x.VibrationBind
+		if x, ok := x.Mode.(*TriggerConfiguration_Default); ok {
+			return x.Default
+		}
 	}
 	return nil
 }
 
-func (x *AutoTrigger) GetMixedBorder() int32 {
+func (x *TriggerConfiguration) GetRace() *TriggerRace {
 	if x != nil {
-		return x.MixedBorder
-	}
-	return 0
-}
-
-func (x *AutoTrigger) GetMixedParams() []int32 {
-	if x != nil {
-		return x.MixedParams
+		if x, ok := x.Mode.(*TriggerConfiguration_Race); ok {
+			return x.Race
+		}
 	}
 	return nil
 }
 
-type TriggerMotor struct {
+func (x *TriggerConfiguration) GetRecoil() *TriggerRecoil {
+	if x != nil {
+		if x, ok := x.Mode.(*TriggerConfiguration_Recoil); ok {
+			return x.Recoil
+		}
+	}
+	return nil
+}
+
+func (x *TriggerConfiguration) GetSniper() *TriggerSniper {
+	if x != nil {
+		if x, ok := x.Mode.(*TriggerConfiguration_Sniper); ok {
+			return x.Sniper
+		}
+	}
+	return nil
+}
+
+func (x *TriggerConfiguration) GetLock() *TriggerLock {
+	if x != nil {
+		if x, ok := x.Mode.(*TriggerConfiguration_Lock); ok {
+			return x.Lock
+		}
+	}
+	return nil
+}
+
+func (x *TriggerConfiguration) GetVibration() *TriggerVibration {
+	if x != nil {
+		if x, ok := x.Mode.(*TriggerConfiguration_Vibration); ok {
+			return x.Vibration
+		}
+	}
+	return nil
+}
+
+type isTriggerConfiguration_Mode interface {
+	isTriggerConfiguration_Mode()
+}
+
+type TriggerConfiguration_Default struct {
+	Default *TriggerDefault `protobuf:"bytes,10,opt,name=default,proto3,oneof"`
+}
+
+type TriggerConfiguration_Race struct {
+	Race *TriggerRace `protobuf:"bytes,11,opt,name=race,proto3,oneof"`
+}
+
+type TriggerConfiguration_Recoil struct {
+	Recoil *TriggerRecoil `protobuf:"bytes,12,opt,name=recoil,proto3,oneof"`
+}
+
+type TriggerConfiguration_Sniper struct {
+	Sniper *TriggerSniper `protobuf:"bytes,13,opt,name=sniper,proto3,oneof"`
+}
+
+type TriggerConfiguration_Lock struct {
+	Lock *TriggerLock `protobuf:"bytes,14,opt,name=lock,proto3,oneof"`
+}
+
+type TriggerConfiguration_Vibration struct {
+	Vibration *TriggerVibration `protobuf:"bytes,15,opt,name=vibration,proto3,oneof"`
+}
+
+func (*TriggerConfiguration_Default) isTriggerConfiguration_Mode() {}
+
+func (*TriggerConfiguration_Race) isTriggerConfiguration_Mode() {}
+
+func (*TriggerConfiguration_Recoil) isTriggerConfiguration_Mode() {}
+
+func (*TriggerConfiguration_Sniper) isTriggerConfiguration_Mode() {}
+
+func (*TriggerConfiguration_Lock) isTriggerConfiguration_Mode() {}
+
+func (*TriggerConfiguration_Vibration) isTriggerConfiguration_Mode() {}
+
+type TriggerDefault struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LineGear      *TriggerMotorSet       `protobuf:"bytes,1,opt,name=lineGear,proto3" json:"lineGear,omitempty"`
-	MicrGear      *TriggerMotorSet       `protobuf:"bytes,2,opt,name=micrGear,proto3" json:"micrGear,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TriggerMotor) Reset() {
-	*x = TriggerMotor{}
+func (x *TriggerDefault) Reset() {
+	*x = TriggerDefault{}
+	mi := &file_flydigi_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TriggerDefault) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TriggerDefault) ProtoMessage() {}
+
+func (x *TriggerDefault) ProtoReflect() protoreflect.Message {
+	mi := &file_flydigi_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TriggerDefault.ProtoReflect.Descriptor instead.
+func (*TriggerDefault) Descriptor() ([]byte, []int) {
+	return file_flydigi_proto_rawDescGZIP(), []int{4}
+}
+
+type TriggerRace struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	InitialPos    int32                  `protobuf:"varint,1,opt,name=initialPos,proto3" json:"initialPos,omitempty"`
+	Pressure      int32                  `protobuf:"varint,2,opt,name=pressure,proto3" json:"pressure,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TriggerRace) Reset() {
+	*x = TriggerRace{}
+	mi := &file_flydigi_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TriggerRace) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TriggerRace) ProtoMessage() {}
+
+func (x *TriggerRace) ProtoReflect() protoreflect.Message {
+	mi := &file_flydigi_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TriggerRace.ProtoReflect.Descriptor instead.
+func (*TriggerRace) Descriptor() ([]byte, []int) {
+	return file_flydigi_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *TriggerRace) GetInitialPos() int32 {
+	if x != nil {
+		return x.InitialPos
+	}
+	return 0
+}
+
+func (x *TriggerRace) GetPressure() int32 {
+	if x != nil {
+		return x.Pressure
+	}
+	return 0
+}
+
+type TriggerRecoil struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	InitialPos      int32                  `protobuf:"varint,1,opt,name=initialPos,proto3" json:"initialPos,omitempty"`
+	InitialStrength int32                  `protobuf:"varint,2,opt,name=initialStrength,proto3" json:"initialStrength,omitempty"`
+	Intensity       int32                  `protobuf:"varint,3,opt,name=intensity,proto3" json:"intensity,omitempty"`
+	Frequency       int32                  `protobuf:"varint,4,opt,name=frequency,proto3" json:"frequency,omitempty"`
+	InputAfter      bool                   `protobuf:"varint,5,opt,name=inputAfter,proto3" json:"inputAfter,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *TriggerRecoil) Reset() {
+	*x = TriggerRecoil{}
 	mi := &file_flydigi_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TriggerMotor) String() string {
+func (x *TriggerRecoil) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TriggerMotor) ProtoMessage() {}
+func (*TriggerRecoil) ProtoMessage() {}
 
-func (x *TriggerMotor) ProtoReflect() protoreflect.Message {
+func (x *TriggerRecoil) ProtoReflect() protoreflect.Message {
 	mi := &file_flydigi_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -479,52 +528,70 @@ func (x *TriggerMotor) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TriggerMotor.ProtoReflect.Descriptor instead.
-func (*TriggerMotor) Descriptor() ([]byte, []int) {
+// Deprecated: Use TriggerRecoil.ProtoReflect.Descriptor instead.
+func (*TriggerRecoil) Descriptor() ([]byte, []int) {
 	return file_flydigi_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *TriggerMotor) GetLineGear() *TriggerMotorSet {
+func (x *TriggerRecoil) GetInitialPos() int32 {
 	if x != nil {
-		return x.LineGear
+		return x.InitialPos
 	}
-	return nil
+	return 0
 }
 
-func (x *TriggerMotor) GetMicrGear() *TriggerMotorSet {
+func (x *TriggerRecoil) GetInitialStrength() int32 {
 	if x != nil {
-		return x.MicrGear
+		return x.InitialStrength
 	}
-	return nil
+	return 0
 }
 
-type TriggerMotorSet struct {
+func (x *TriggerRecoil) GetIntensity() int32 {
+	if x != nil {
+		return x.Intensity
+	}
+	return 0
+}
+
+func (x *TriggerRecoil) GetFrequency() int32 {
+	if x != nil {
+		return x.Frequency
+	}
+	return 0
+}
+
+func (x *TriggerRecoil) GetInputAfter() bool {
+	if x != nil {
+		return x.InputAfter
+	}
+	return false
+}
+
+type TriggerSniper struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          int32                  `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`
-	Min           int32                  `protobuf:"varint,2,opt,name=min,proto3" json:"min,omitempty"`
-	Max           int32                  `protobuf:"varint,3,opt,name=max,proto3" json:"max,omitempty"`
-	Filter        int32                  `protobuf:"varint,4,opt,name=filter,proto3" json:"filter,omitempty"`
-	VibrLimit     int32                  `protobuf:"varint,5,opt,name=vibrLimit,proto3" json:"vibrLimit,omitempty"`
-	Scale         int32                  `protobuf:"varint,6,opt,name=scale,proto3" json:"scale,omitempty"`
-	TimeLimit     int32                  `protobuf:"varint,7,opt,name=timeLimit,proto3" json:"timeLimit,omitempty"`
+	InitialPos    int32                  `protobuf:"varint,1,opt,name=initialPos,proto3" json:"initialPos,omitempty"`
+	Length        int32                  `protobuf:"varint,2,opt,name=length,proto3" json:"length,omitempty"`
+	Pressure      int32                  `protobuf:"varint,3,opt,name=pressure,proto3" json:"pressure,omitempty"`
+	InputAfter    bool                   `protobuf:"varint,4,opt,name=inputAfter,proto3" json:"inputAfter,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TriggerMotorSet) Reset() {
-	*x = TriggerMotorSet{}
+func (x *TriggerSniper) Reset() {
+	*x = TriggerSniper{}
 	mi := &file_flydigi_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TriggerMotorSet) String() string {
+func (x *TriggerSniper) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TriggerMotorSet) ProtoMessage() {}
+func (*TriggerSniper) ProtoMessage() {}
 
-func (x *TriggerMotorSet) ProtoReflect() protoreflect.Message {
+func (x *TriggerSniper) ProtoReflect() protoreflect.Message {
 	mi := &file_flydigi_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -536,56 +603,147 @@ func (x *TriggerMotorSet) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TriggerMotorSet.ProtoReflect.Descriptor instead.
-func (*TriggerMotorSet) Descriptor() ([]byte, []int) {
+// Deprecated: Use TriggerSniper.ProtoReflect.Descriptor instead.
+func (*TriggerSniper) Descriptor() ([]byte, []int) {
 	return file_flydigi_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *TriggerMotorSet) GetType() int32 {
+func (x *TriggerSniper) GetInitialPos() int32 {
 	if x != nil {
-		return x.Type
+		return x.InitialPos
 	}
 	return 0
 }
 
-func (x *TriggerMotorSet) GetMin() int32 {
+func (x *TriggerSniper) GetLength() int32 {
 	if x != nil {
-		return x.Min
+		return x.Length
 	}
 	return 0
 }
 
-func (x *TriggerMotorSet) GetMax() int32 {
+func (x *TriggerSniper) GetPressure() int32 {
 	if x != nil {
-		return x.Max
+		return x.Pressure
 	}
 	return 0
 }
 
-func (x *TriggerMotorSet) GetFilter() int32 {
+func (x *TriggerSniper) GetInputAfter() bool {
 	if x != nil {
-		return x.Filter
+		return x.InputAfter
+	}
+	return false
+}
+
+type TriggerLock struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	InitialPos    int32                  `protobuf:"varint,1,opt,name=initialPos,proto3" json:"initialPos,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TriggerLock) Reset() {
+	*x = TriggerLock{}
+	mi := &file_flydigi_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TriggerLock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TriggerLock) ProtoMessage() {}
+
+func (x *TriggerLock) ProtoReflect() protoreflect.Message {
+	mi := &file_flydigi_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TriggerLock.ProtoReflect.Descriptor instead.
+func (*TriggerLock) Descriptor() ([]byte, []int) {
+	return file_flydigi_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *TriggerLock) GetInitialPos() int32 {
+	if x != nil {
+		return x.InitialPos
 	}
 	return 0
 }
 
-func (x *TriggerMotorSet) GetVibrLimit() int32 {
+type TriggerVibration struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Coefficient   int32                  `protobuf:"varint,1,opt,name=coefficient,proto3" json:"coefficient,omitempty"`
+	Threshold     int32                  `protobuf:"varint,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	TravelRange   int32                  `protobuf:"varint,3,opt,name=travelRange,proto3" json:"travelRange,omitempty"`
+	Frequency     int32                  `protobuf:"varint,4,opt,name=frequency,proto3" json:"frequency,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TriggerVibration) Reset() {
+	*x = TriggerVibration{}
+	mi := &file_flydigi_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TriggerVibration) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TriggerVibration) ProtoMessage() {}
+
+func (x *TriggerVibration) ProtoReflect() protoreflect.Message {
+	mi := &file_flydigi_proto_msgTypes[9]
 	if x != nil {
-		return x.VibrLimit
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TriggerVibration.ProtoReflect.Descriptor instead.
+func (*TriggerVibration) Descriptor() ([]byte, []int) {
+	return file_flydigi_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *TriggerVibration) GetCoefficient() int32 {
+	if x != nil {
+		return x.Coefficient
 	}
 	return 0
 }
 
-func (x *TriggerMotorSet) GetScale() int32 {
+func (x *TriggerVibration) GetThreshold() int32 {
 	if x != nil {
-		return x.Scale
+		return x.Threshold
 	}
 	return 0
 }
 
-func (x *TriggerMotorSet) GetTimeLimit() int32 {
+func (x *TriggerVibration) GetTravelRange() int32 {
 	if x != nil {
-		return x.TimeLimit
+		return x.TravelRange
+	}
+	return 0
+}
+
+func (x *TriggerVibration) GetFrequency() int32 {
+	if x != nil {
+		return x.Frequency
 	}
 	return 0
 }
@@ -598,7 +756,7 @@ type LedsOff struct {
 
 func (x *LedsOff) Reset() {
 	*x = LedsOff{}
-	mi := &file_flydigi_proto_msgTypes[8]
+	mi := &file_flydigi_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -610,7 +768,7 @@ func (x *LedsOff) String() string {
 func (*LedsOff) ProtoMessage() {}
 
 func (x *LedsOff) ProtoReflect() protoreflect.Message {
-	mi := &file_flydigi_proto_msgTypes[8]
+	mi := &file_flydigi_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -623,7 +781,7 @@ func (x *LedsOff) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LedsOff.ProtoReflect.Descriptor instead.
 func (*LedsOff) Descriptor() ([]byte, []int) {
-	return file_flydigi_proto_rawDescGZIP(), []int{8}
+	return file_flydigi_proto_rawDescGZIP(), []int{10}
 }
 
 type LedsSteady struct {
@@ -635,7 +793,7 @@ type LedsSteady struct {
 
 func (x *LedsSteady) Reset() {
 	*x = LedsSteady{}
-	mi := &file_flydigi_proto_msgTypes[9]
+	mi := &file_flydigi_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -647,7 +805,7 @@ func (x *LedsSteady) String() string {
 func (*LedsSteady) ProtoMessage() {}
 
 func (x *LedsSteady) ProtoReflect() protoreflect.Message {
-	mi := &file_flydigi_proto_msgTypes[9]
+	mi := &file_flydigi_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -660,7 +818,7 @@ func (x *LedsSteady) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LedsSteady.ProtoReflect.Descriptor instead.
 func (*LedsSteady) Descriptor() ([]byte, []int) {
-	return file_flydigi_proto_rawDescGZIP(), []int{9}
+	return file_flydigi_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *LedsSteady) GetColor() *Color {
@@ -679,7 +837,7 @@ type LedsStreamlined struct {
 
 func (x *LedsStreamlined) Reset() {
 	*x = LedsStreamlined{}
-	mi := &file_flydigi_proto_msgTypes[10]
+	mi := &file_flydigi_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -691,7 +849,7 @@ func (x *LedsStreamlined) String() string {
 func (*LedsStreamlined) ProtoMessage() {}
 
 func (x *LedsStreamlined) ProtoReflect() protoreflect.Message {
-	mi := &file_flydigi_proto_msgTypes[10]
+	mi := &file_flydigi_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -704,7 +862,7 @@ func (x *LedsStreamlined) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LedsStreamlined.ProtoReflect.Descriptor instead.
 func (*LedsStreamlined) Descriptor() ([]byte, []int) {
-	return file_flydigi_proto_rawDescGZIP(), []int{10}
+	return file_flydigi_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *LedsStreamlined) GetSpeed() float32 {
@@ -724,7 +882,7 @@ type LedsGradient struct {
 
 func (x *LedsGradient) Reset() {
 	*x = LedsGradient{}
-	mi := &file_flydigi_proto_msgTypes[11]
+	mi := &file_flydigi_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -736,7 +894,7 @@ func (x *LedsGradient) String() string {
 func (*LedsGradient) ProtoMessage() {}
 
 func (x *LedsGradient) ProtoReflect() protoreflect.Message {
-	mi := &file_flydigi_proto_msgTypes[11]
+	mi := &file_flydigi_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -749,7 +907,7 @@ func (x *LedsGradient) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LedsGradient.ProtoReflect.Descriptor instead.
 func (*LedsGradient) Descriptor() ([]byte, []int) {
-	return file_flydigi_proto_rawDescGZIP(), []int{11}
+	return file_flydigi_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *LedsGradient) GetSpeed() float32 {
@@ -782,7 +940,7 @@ type LedsConfiguration struct {
 
 func (x *LedsConfiguration) Reset() {
 	*x = LedsConfiguration{}
-	mi := &file_flydigi_proto_msgTypes[12]
+	mi := &file_flydigi_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -794,7 +952,7 @@ func (x *LedsConfiguration) String() string {
 func (*LedsConfiguration) ProtoMessage() {}
 
 func (x *LedsConfiguration) ProtoReflect() protoreflect.Message {
-	mi := &file_flydigi_proto_msgTypes[12]
+	mi := &file_flydigi_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -807,7 +965,7 @@ func (x *LedsConfiguration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LedsConfiguration.ProtoReflect.Descriptor instead.
 func (*LedsConfiguration) Descriptor() ([]byte, []int) {
-	return file_flydigi_proto_rawDescGZIP(), []int{12}
+	return file_flydigi_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *LedsConfiguration) GetBrightness() float32 {
@@ -897,7 +1055,7 @@ type Color struct {
 
 func (x *Color) Reset() {
 	*x = Color{}
-	mi := &file_flydigi_proto_msgTypes[13]
+	mi := &file_flydigi_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -909,7 +1067,7 @@ func (x *Color) String() string {
 func (*Color) ProtoMessage() {}
 
 func (x *Color) ProtoReflect() protoreflect.Message {
-	mi := &file_flydigi_proto_msgTypes[13]
+	mi := &file_flydigi_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -922,7 +1080,7 @@ func (x *Color) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Color.ProtoReflect.Descriptor instead.
 func (*Color) Descriptor() ([]byte, []int) {
-	return file_flydigi_proto_rawDescGZIP(), []int{13}
+	return file_flydigi_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *Color) GetRgb() int32 {
@@ -949,31 +1107,50 @@ const file_flydigi_proto_rawDesc = "" +
 	"\fleft_trigger\x18\x03 \x01(\v2\x1d.flydigi.TriggerConfigurationR\vleftTrigger\x12B\n" +
 	"\rright_trigger\x18\x04 \x01(\v2\x1d.flydigi.TriggerConfigurationR\frightTrigger\"3\n" +
 	"\x15JoystickConfiguration\x12\x1a\n" +
-	"\bdeadzone\x18\x01 \x01(\x05R\bdeadzone\"}\n" +
-	"\rVibrationBind\x12\x12\n" +
-	"\x04type\x18\x01 \x01(\x05R\x04type\x12\x1c\n" +
-	"\tminFilter\x18\x02 \x01(\x05R\tminFilter\x12\x14\n" +
-	"\x05scale\x18\x03 \x01(\x05R\x05scale\x12$\n" +
-	"\rtriggerParams\x18\x04 \x03(\x05R\rtriggerParams\"\x89\x01\n" +
-	"\x14TriggerConfiguration\x126\n" +
-	"\vautoTrigger\x18\x01 \x01(\v2\x14.flydigi.AutoTriggerR\vautoTrigger\x129\n" +
-	"\ftriggerMotor\x18\x02 \x01(\v2\x15.flydigi.TriggerMotorR\ftriggerMotor\"\xa3\x01\n" +
-	"\vAutoTrigger\x12\x12\n" +
-	"\x04mode\x18\x01 \x01(\x05R\x04mode\x12<\n" +
-	"\rvibrationBind\x18\x02 \x01(\v2\x16.flydigi.VibrationBindR\rvibrationBind\x12 \n" +
-	"\vmixedBorder\x18\x03 \x01(\x05R\vmixedBorder\x12 \n" +
-	"\vmixedParams\x18\x04 \x03(\x05R\vmixedParams\"z\n" +
-	"\fTriggerMotor\x124\n" +
-	"\blineGear\x18\x01 \x01(\v2\x18.flydigi.TriggerMotorSetR\blineGear\x124\n" +
-	"\bmicrGear\x18\x02 \x01(\v2\x18.flydigi.TriggerMotorSetR\bmicrGear\"\xb3\x01\n" +
-	"\x0fTriggerMotorSet\x12\x12\n" +
-	"\x04type\x18\x01 \x01(\x05R\x04type\x12\x10\n" +
-	"\x03min\x18\x02 \x01(\x05R\x03min\x12\x10\n" +
-	"\x03max\x18\x03 \x01(\x05R\x03max\x12\x16\n" +
-	"\x06filter\x18\x04 \x01(\x05R\x06filter\x12\x1c\n" +
-	"\tvibrLimit\x18\x05 \x01(\x05R\tvibrLimit\x12\x14\n" +
-	"\x05scale\x18\x06 \x01(\x05R\x05scale\x12\x1c\n" +
-	"\ttimeLimit\x18\a \x01(\x05R\ttimeLimit\"\t\n" +
+	"\bdeadzone\x18\x01 \x01(\x05R\bdeadzone\"\xca\x02\n" +
+	"\x14TriggerConfiguration\x123\n" +
+	"\adefault\x18\n" +
+	" \x01(\v2\x17.flydigi.TriggerDefaultH\x00R\adefault\x12*\n" +
+	"\x04race\x18\v \x01(\v2\x14.flydigi.TriggerRaceH\x00R\x04race\x120\n" +
+	"\x06recoil\x18\f \x01(\v2\x16.flydigi.TriggerRecoilH\x00R\x06recoil\x120\n" +
+	"\x06sniper\x18\r \x01(\v2\x16.flydigi.TriggerSniperH\x00R\x06sniper\x12*\n" +
+	"\x04lock\x18\x0e \x01(\v2\x14.flydigi.TriggerLockH\x00R\x04lock\x129\n" +
+	"\tvibration\x18\x0f \x01(\v2\x19.flydigi.TriggerVibrationH\x00R\tvibrationB\x06\n" +
+	"\x04mode\"\x10\n" +
+	"\x0eTriggerDefault\"I\n" +
+	"\vTriggerRace\x12\x1e\n" +
+	"\n" +
+	"initialPos\x18\x01 \x01(\x05R\n" +
+	"initialPos\x12\x1a\n" +
+	"\bpressure\x18\x02 \x01(\x05R\bpressure\"\xb5\x01\n" +
+	"\rTriggerRecoil\x12\x1e\n" +
+	"\n" +
+	"initialPos\x18\x01 \x01(\x05R\n" +
+	"initialPos\x12(\n" +
+	"\x0finitialStrength\x18\x02 \x01(\x05R\x0finitialStrength\x12\x1c\n" +
+	"\tintensity\x18\x03 \x01(\x05R\tintensity\x12\x1c\n" +
+	"\tfrequency\x18\x04 \x01(\x05R\tfrequency\x12\x1e\n" +
+	"\n" +
+	"inputAfter\x18\x05 \x01(\bR\n" +
+	"inputAfter\"\x83\x01\n" +
+	"\rTriggerSniper\x12\x1e\n" +
+	"\n" +
+	"initialPos\x18\x01 \x01(\x05R\n" +
+	"initialPos\x12\x16\n" +
+	"\x06length\x18\x02 \x01(\x05R\x06length\x12\x1a\n" +
+	"\bpressure\x18\x03 \x01(\x05R\bpressure\x12\x1e\n" +
+	"\n" +
+	"inputAfter\x18\x04 \x01(\bR\n" +
+	"inputAfter\"-\n" +
+	"\vTriggerLock\x12\x1e\n" +
+	"\n" +
+	"initialPos\x18\x01 \x01(\x05R\n" +
+	"initialPos\"\x92\x01\n" +
+	"\x10TriggerVibration\x12 \n" +
+	"\vcoefficient\x18\x01 \x01(\x05R\vcoefficient\x12\x1c\n" +
+	"\tthreshold\x18\x02 \x01(\x05R\tthreshold\x12 \n" +
+	"\vtravelRange\x18\x03 \x01(\x05R\vtravelRange\x12\x1c\n" +
+	"\tfrequency\x18\x04 \x01(\x05R\tfrequency\"\t\n" +
 	"\aLedsOff\"2\n" +
 	"\n" +
 	"LedsSteady\x12$\n" +
@@ -1013,46 +1190,49 @@ func file_flydigi_proto_rawDescGZIP() []byte {
 }
 
 var file_flydigi_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_flydigi_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_flydigi_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_flydigi_proto_goTypes = []any{
 	(ConnectionType)(0),           // 0: flydigi.ConnectionType
 	(*GamepadInfo)(nil),           // 1: flydigi.GamepadInfo
 	(*GamepadConfiguration)(nil),  // 2: flydigi.GamepadConfiguration
 	(*JoystickConfiguration)(nil), // 3: flydigi.JoystickConfiguration
-	(*VibrationBind)(nil),         // 4: flydigi.VibrationBind
-	(*TriggerConfiguration)(nil),  // 5: flydigi.TriggerConfiguration
-	(*AutoTrigger)(nil),           // 6: flydigi.AutoTrigger
-	(*TriggerMotor)(nil),          // 7: flydigi.TriggerMotor
-	(*TriggerMotorSet)(nil),       // 8: flydigi.TriggerMotorSet
-	(*LedsOff)(nil),               // 9: flydigi.LedsOff
-	(*LedsSteady)(nil),            // 10: flydigi.LedsSteady
-	(*LedsStreamlined)(nil),       // 11: flydigi.LedsStreamlined
-	(*LedsGradient)(nil),          // 12: flydigi.LedsGradient
-	(*LedsConfiguration)(nil),     // 13: flydigi.LedsConfiguration
-	(*Color)(nil),                 // 14: flydigi.Color
+	(*TriggerConfiguration)(nil),  // 4: flydigi.TriggerConfiguration
+	(*TriggerDefault)(nil),        // 5: flydigi.TriggerDefault
+	(*TriggerRace)(nil),           // 6: flydigi.TriggerRace
+	(*TriggerRecoil)(nil),         // 7: flydigi.TriggerRecoil
+	(*TriggerSniper)(nil),         // 8: flydigi.TriggerSniper
+	(*TriggerLock)(nil),           // 9: flydigi.TriggerLock
+	(*TriggerVibration)(nil),      // 10: flydigi.TriggerVibration
+	(*LedsOff)(nil),               // 11: flydigi.LedsOff
+	(*LedsSteady)(nil),            // 12: flydigi.LedsSteady
+	(*LedsStreamlined)(nil),       // 13: flydigi.LedsStreamlined
+	(*LedsGradient)(nil),          // 14: flydigi.LedsGradient
+	(*LedsConfiguration)(nil),     // 15: flydigi.LedsConfiguration
+	(*Color)(nil),                 // 16: flydigi.Color
 }
 var file_flydigi_proto_depIdxs = []int32{
 	0,  // 0: flydigi.GamepadInfo.connection_type:type_name -> flydigi.ConnectionType
 	3,  // 1: flydigi.GamepadConfiguration.left_joystick:type_name -> flydigi.JoystickConfiguration
 	3,  // 2: flydigi.GamepadConfiguration.right_joystick:type_name -> flydigi.JoystickConfiguration
-	5,  // 3: flydigi.GamepadConfiguration.left_trigger:type_name -> flydigi.TriggerConfiguration
-	5,  // 4: flydigi.GamepadConfiguration.right_trigger:type_name -> flydigi.TriggerConfiguration
-	6,  // 5: flydigi.TriggerConfiguration.autoTrigger:type_name -> flydigi.AutoTrigger
-	7,  // 6: flydigi.TriggerConfiguration.triggerMotor:type_name -> flydigi.TriggerMotor
-	4,  // 7: flydigi.AutoTrigger.vibrationBind:type_name -> flydigi.VibrationBind
-	8,  // 8: flydigi.TriggerMotor.lineGear:type_name -> flydigi.TriggerMotorSet
-	8,  // 9: flydigi.TriggerMotor.micrGear:type_name -> flydigi.TriggerMotorSet
-	14, // 10: flydigi.LedsSteady.color:type_name -> flydigi.Color
-	14, // 11: flydigi.LedsGradient.colors:type_name -> flydigi.Color
-	9,  // 12: flydigi.LedsConfiguration.off:type_name -> flydigi.LedsOff
-	10, // 13: flydigi.LedsConfiguration.steady:type_name -> flydigi.LedsSteady
-	11, // 14: flydigi.LedsConfiguration.streamlined:type_name -> flydigi.LedsStreamlined
-	12, // 15: flydigi.LedsConfiguration.gradient:type_name -> flydigi.LedsGradient
-	16, // [16:16] is the sub-list for method output_type
-	16, // [16:16] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	4,  // 3: flydigi.GamepadConfiguration.left_trigger:type_name -> flydigi.TriggerConfiguration
+	4,  // 4: flydigi.GamepadConfiguration.right_trigger:type_name -> flydigi.TriggerConfiguration
+	5,  // 5: flydigi.TriggerConfiguration.default:type_name -> flydigi.TriggerDefault
+	6,  // 6: flydigi.TriggerConfiguration.race:type_name -> flydigi.TriggerRace
+	7,  // 7: flydigi.TriggerConfiguration.recoil:type_name -> flydigi.TriggerRecoil
+	8,  // 8: flydigi.TriggerConfiguration.sniper:type_name -> flydigi.TriggerSniper
+	9,  // 9: flydigi.TriggerConfiguration.lock:type_name -> flydigi.TriggerLock
+	10, // 10: flydigi.TriggerConfiguration.vibration:type_name -> flydigi.TriggerVibration
+	16, // 11: flydigi.LedsSteady.color:type_name -> flydigi.Color
+	16, // 12: flydigi.LedsGradient.colors:type_name -> flydigi.Color
+	11, // 13: flydigi.LedsConfiguration.off:type_name -> flydigi.LedsOff
+	12, // 14: flydigi.LedsConfiguration.steady:type_name -> flydigi.LedsSteady
+	13, // 15: flydigi.LedsConfiguration.streamlined:type_name -> flydigi.LedsStreamlined
+	14, // 16: flydigi.LedsConfiguration.gradient:type_name -> flydigi.LedsGradient
+	17, // [17:17] is the sub-list for method output_type
+	17, // [17:17] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_flydigi_proto_init() }
@@ -1060,7 +1240,15 @@ func file_flydigi_proto_init() {
 	if File_flydigi_proto != nil {
 		return
 	}
-	file_flydigi_proto_msgTypes[12].OneofWrappers = []any{
+	file_flydigi_proto_msgTypes[3].OneofWrappers = []any{
+		(*TriggerConfiguration_Default)(nil),
+		(*TriggerConfiguration_Race)(nil),
+		(*TriggerConfiguration_Recoil)(nil),
+		(*TriggerConfiguration_Sniper)(nil),
+		(*TriggerConfiguration_Lock)(nil),
+		(*TriggerConfiguration_Vibration)(nil),
+	}
+	file_flydigi_proto_msgTypes[14].OneofWrappers = []any{
 		(*LedsConfiguration_Off)(nil),
 		(*LedsConfiguration_Steady)(nil),
 		(*LedsConfiguration_Streamlined)(nil),
@@ -1072,7 +1260,7 @@ func file_flydigi_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_flydigi_proto_rawDesc), len(file_flydigi_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

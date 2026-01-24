@@ -29,38 +29,49 @@ message JoystickConfiguration {
     int32 deadzone = 1;
 }
 
-message VibrationBind {
-    int32 type = 1;
-    int32 minFilter = 2;
-    int32 scale = 3;
-    repeated int32 triggerParams = 4;
-}
-
 message TriggerConfiguration {
-    AutoTrigger autoTrigger = 1;
-	TriggerMotor triggerMotor = 2;
+    oneof mode {
+        TriggerDefault default = 10;
+        TriggerRace race = 11;
+        TriggerRecoil recoil = 12;
+        TriggerSniper sniper = 13;
+        TriggerLock lock = 14;
+        TriggerVibration vibration = 15;
+    }
 }
 
-message AutoTrigger {
-    int32 mode = 1;
-    VibrationBind vibrationBind = 2;
-    int32 mixedBorder = 3;
-	repeated int32 mixedParams = 4;
+message TriggerDefault {
 }
 
-message TriggerMotor {
-    TriggerMotorSet lineGear = 1;
-    TriggerMotorSet micrGear = 2;
+message TriggerRace {
+    int32 initialPos = 1;
+    int32 pressure = 2;
 }
 
-message TriggerMotorSet {
-    int32 type = 1;
-	int32 min = 2;
-	int32 max = 3;
-	int32 filter = 4;
-	int32 vibrLimit = 5;
-	int32 scale = 6;
-	int32 timeLimit = 7;
+message TriggerRecoil {
+    int32 initialPos = 1;
+    int32 initialStrength = 2;
+    int32 intensity = 3;
+    int32 frequency = 4;
+    bool inputAfter = 5;
+}
+
+message TriggerSniper {
+    int32 initialPos = 1;
+    int32 length = 2;
+    int32 pressure = 3;
+    bool inputAfter = 4;
+}
+
+message TriggerLock {
+    int32 initialPos = 1;
+}
+
+message TriggerVibration {
+    int32 coefficient = 1;
+    int32 threshold = 2;
+    int32 travelRange = 3;
+    int32 frequency = 4;
 }
 
 message LedsOff {

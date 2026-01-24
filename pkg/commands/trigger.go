@@ -1,48 +1,15 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
-	"strconv"
 
 	"github.com/pipe01/flydigictl/pkg/dbus/pb"
 	"github.com/spf13/cobra"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type triggerSide string
-
-type TriggerMotorSetJson *struct {
-	Type      *int32 `json:"Type"`
-	Min       *int32 `json:"Min"`
-	Max       *int32 `json:"Max"`
-	Filter    *int32 `json:"Filter"`
-	VibrLimit *int32 `json:"VibrLimit"`
-	Scale     *int32 `json:"Scale"`
-	TimeLimit *int32 `json:"TimeLimit"`
-}
-
-type TriggerJSON struct {
-	AutoTrigger *struct {
-		Mode *int32 `json:"Mode"`
-
-		VibrationBind *struct {
-			Type          *int32  `json:"Type"`
-			MinFilter     *int32  `json:"MinFilter"`
-			Scale         *int32  `json:"Scale"`
-			TriggerParams []int32 `json:"TriggerParams"`
-		} `json:"VibrationBind"`
-
-		MixedBorder *int32  `json:"MixedBorder"`
-		MixedParams []int32 `json:"MixedParams"`
-	} `json:"AutoTrigger"`
-
-	TriggerMotor *struct {
-		LineGear TriggerMotorSetJson `json:"LineGear"`
-		MicrGear TriggerMotorSetJson `json:"MicrGear"`
-	} `json:"TriggerMotor"`
-}
 
 const (
 	triggerLeft  triggerSide = "left"
@@ -59,129 +26,40 @@ func (s triggerSide) GetBean(b *pb.GamepadConfiguration) *pb.TriggerConfiguratio
 	panic("invalid trigger side")
 }
 
-func triggerModeName(mode int32) string {
-	switch mode {
-	case 0:
-		return "default"
-	case 1:
-		return "race"
-	case 2:
-		return "recoil"
-	case 3:
-		return "sniper"
-	case 4:
-		return "lock"
-	case 5:
-		return "vibration"
-	default:
-		return fmt.Sprintf("unknown(%d)", mode)
-	}
-}
-
-func loadTriggerJSON(path string) (*TriggerJSON, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	var cfg TriggerJSON
-	if err := json.Unmarshal(data, &cfg); err != nil {
-		return nil, err
-	}
-
-	return &cfg, nil
-}
-
-func applyTriggerJSON(dst *pb.TriggerConfiguration, src *TriggerJSON) {
-	if src.AutoTrigger != nil {
-		at := dst.AutoTrigger
-
-		if src.AutoTrigger.Mode != nil {
-			at.Mode = *src.AutoTrigger.Mode
-		}
-
-		if src.AutoTrigger.VibrationBind != nil {
-			vb := at.VibrationBind
-
-			if src.AutoTrigger.VibrationBind.Type != nil {
-				vb.Type = *src.AutoTrigger.VibrationBind.Type
-			}
-			if src.AutoTrigger.VibrationBind.MinFilter != nil {
-				vb.MinFilter = *src.AutoTrigger.VibrationBind.MinFilter
-			}
-			if src.AutoTrigger.VibrationBind.Scale != nil {
-				vb.Scale = *src.AutoTrigger.VibrationBind.Scale
-			}
-			if len(src.AutoTrigger.VibrationBind.TriggerParams) > 0 {
-				vb.TriggerParams = src.AutoTrigger.VibrationBind.TriggerParams
-			}
-		}
-
-		if src.AutoTrigger.MixedBorder != nil {
-			at.MixedBorder = *src.AutoTrigger.MixedBorder
-		}
-		if len(src.AutoTrigger.MixedParams) > 0 {
-			at.MixedParams = src.AutoTrigger.MixedParams
-		}
-	}
-
-	if src.TriggerMotor != nil {
-		if src.TriggerMotor.LineGear != nil {
-			lg := dst.TriggerMotor.LineGear
-
-			if src.TriggerMotor.LineGear.Type != nil {
-				lg.Type = *src.TriggerMotor.LineGear.Type
-			}
-			if src.TriggerMotor.LineGear.Min != nil {
-				lg.Min = *src.TriggerMotor.LineGear.Min
-			}
-			if src.TriggerMotor.LineGear.Max != nil {
-				lg.Max = *src.TriggerMotor.LineGear.Max
-			}
-			if src.TriggerMotor.LineGear.Filter != nil {
-				lg.Filter = *src.TriggerMotor.LineGear.Filter
-			}
-			if src.TriggerMotor.LineGear.VibrLimit != nil {
-				lg.VibrLimit = *src.TriggerMotor.LineGear.VibrLimit
-			}
-			if src.TriggerMotor.LineGear.Scale != nil {
-				lg.Scale = *src.TriggerMotor.LineGear.Scale
-			}
-			if src.TriggerMotor.LineGear.TimeLimit != nil {
-				lg.TimeLimit = *src.TriggerMotor.LineGear.TimeLimit
-			}
-		}
-		if src.TriggerMotor.MicrGear != nil {
-			lg := dst.TriggerMotor.MicrGear
-
-			if src.TriggerMotor.MicrGear.Type != nil {
-				lg.Type = *src.TriggerMotor.MicrGear.Type
-			}
-			if src.TriggerMotor.MicrGear.Min != nil {
-				lg.Min = *src.TriggerMotor.MicrGear.Min
-			}
-			if src.TriggerMotor.MicrGear.Max != nil {
-				lg.Max = *src.TriggerMotor.MicrGear.Max
-			}
-			if src.TriggerMotor.MicrGear.Filter != nil {
-				lg.Filter = *src.TriggerMotor.MicrGear.Filter
-			}
-			if src.TriggerMotor.MicrGear.VibrLimit != nil {
-				lg.VibrLimit = *src.TriggerMotor.MicrGear.VibrLimit
-			}
-			if src.TriggerMotor.MicrGear.Scale != nil {
-				lg.Scale = *src.TriggerMotor.MicrGear.Scale
-			}
-			if src.TriggerMotor.MicrGear.TimeLimit != nil {
-				lg.TimeLimit = *src.TriggerMotor.MicrGear.TimeLimit
-			}
-		}
-	}
-}
-
 var triggerCommand = &cobra.Command{
 	Use:   "trigger",
 	Short: "Configure triggers (Apex 4)",
+}
+var showDetails bool
+
+var raceOptions struct {
+	InitialPos int
+	Pressure   int
+}
+var recoilOptions struct {
+	InitialPos      int
+	InitialStrength int
+	Intensity       int
+	Frequency       int
+	InputAfter      bool
+}
+
+var sniperOptions struct {
+	InitialPos int
+	Length     int
+	Pressure   int
+	InputAfter bool
+}
+
+var lockOptions struct {
+	InitialPos int
+}
+
+var vibrationOptions struct {
+	Coefficient int
+	Threshold   int
+	TravelRange int
+	Frequency   int
 }
 
 func genTriggerCommand(side triggerSide) *cobra.Command {
@@ -189,20 +67,76 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		Use:   string(side),
 		Short: fmt.Sprintf("Manage %s trigger configuration", side),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			mode, err := readConfiguration(func(conf *pb.GamepadConfiguration) int32 {
-				return int32(side.GetBean(conf).AutoTrigger.Mode)
+			cfg, err := readConfiguration(func(conf *pb.GamepadConfiguration) *pb.TriggerConfiguration {
+				return side.GetBean(conf)
 			})
 			if err != nil {
 				return fmt.Errorf("get configuration: %w", err)
 			}
 
-			modeName := triggerModeName(mode)
+			switch mode := cfg.Mode.(type) {
+			case *pb.TriggerConfiguration_Race:
 
-			if terseOutput {
-				fmt.Println(modeName)
-			} else {
-				fmt.Printf("%s trigger mode: %s\n", side, modeName)
+				if terseOutput {
+					fmt.Print("race")
+					return nil
+				}
+
+				fmt.Printf("%s trigger mode: Race", side)
+
+				if showDetails {
+					fmt.Printf("  %-22s : %v\n", "Initial position", mode.Race.InitialPos)
+					fmt.Printf("  %-22s : %v\n", "Pressure", mode.Race.Pressure)
+				}
+			case *pb.TriggerConfiguration_Recoil:
+				if terseOutput {
+					fmt.Println("recoil")
+					return nil
+				}
+
+				fmt.Printf("%s trigger mode: Race\n", cases.Title(language.English, cases.NoLower).String(string(side)))
+				if showDetails {
+					fmt.Printf("  %-22s : %v\n", "Initial position", mode.Recoil.InitialPos)
+					fmt.Printf("  %-22s : %v\n", "Initial strength", mode.Recoil.InitialStrength)
+					fmt.Printf("  %-22s : %v\n", "Intensity", mode.Recoil.Intensity)
+					fmt.Printf("  %-22s : %v\n", "Frequency", mode.Recoil.Frequency)
+					fmt.Printf("  %-22s : %v\n", "Input After Trigger", mode.Recoil.InputAfter)
+				}
+			case *pb.TriggerConfiguration_Sniper:
+				if terseOutput {
+					fmt.Println("sniper")
+					return nil
+				}
+				fmt.Printf("%s trigger mode: Sniper\n", cases.Title(language.English, cases.NoLower).String(string(side)))
+				if showDetails {
+					fmt.Printf("  %-22s : %v\n", "Initial position", mode.Sniper.InitialPos)
+					fmt.Printf("  %-22s : %v\n", "Length", mode.Sniper.Length)
+					fmt.Printf("  %-22s : %v\n", "Pressure", mode.Sniper.Pressure)
+					fmt.Printf("  %-22s : %v\n", "Input After Trigger", mode.Sniper.InputAfter)
+				}
+			case *pb.TriggerConfiguration_Lock:
+				if terseOutput {
+					fmt.Println("lock")
+					return nil
+				}
+				fmt.Printf("%s trigger mode: Lock\n", cases.Title(language.English, cases.NoLower).String(string(side)))
+				if showDetails {
+					fmt.Printf("  %-22s : %v\n", "Initial position", mode.Lock.InitialPos)
+				}
+			case *pb.TriggerConfiguration_Vibration:
+				if terseOutput {
+					fmt.Println("vibration")
+					return nil
+				}
+				fmt.Printf("%s trigger mode: Vibration\n", cases.Title(language.English, cases.NoLower).String(string(side)))
+				if showDetails {
+					fmt.Printf("  %-22s : %v\n", "Coefficient", mode.Vibration.Coefficient)
+					fmt.Printf("  %-22s : %v\n", "Threshold", mode.Vibration.Threshold)
+					fmt.Printf("  %-22s : %v\n", "Travel range", mode.Vibration.TravelRange)
+					fmt.Printf("  %-22s : %v\n", "Frequency", mode.Vibration.Frequency)
+				}
 			}
+
 			return nil
 		},
 	}
@@ -214,252 +148,252 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
-				cfg.AutoTrigger.Mode = 0
-				cfg.AutoTrigger.VibrationBind.TriggerParams = []int32{1, 10, 1, 90, 0}
-
-				for i := range cfg.AutoTrigger.MixedParams {
-					cfg.AutoTrigger.MixedParams[i] = 0
-				}
-
-				lg := cfg.TriggerMotor.LineGear
-				lg.Type = 1
-				lg.Min = 30
-				lg.Max = 80
-				lg.Filter = 5
-				lg.VibrLimit = 1
-				lg.Scale = 50
-				lg.TimeLimit = 0
+				cfg.Mode = &pb.TriggerConfiguration_Default{}
 			})
 		},
 	})
-	cmd.AddCommand(&cobra.Command{
-		Use:   "race <initial_pos:0-192> <pressure:1-255>",
+
+	raceCmd := &cobra.Command{
+		Use:   "race",
 		Short: "Set this trigger to race mode",
-		Args:  cobra.MaximumNArgs(2),
+		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			initialPos := 0 // 0-192
-			pressure := 30  // 1-255
-
-			if len(args) >= 1 {
-				v, err := strconv.Atoi(args[0])
-				if err != nil {
-					return fmt.Errorf("invalid start value: %q", args[0])
-				}
-				if v < 0 || v > 192 {
-					return fmt.Errorf("start must be between 0 and 192")
-				}
-				initialPos = v
+			if raceOptions.InitialPos < 0 || raceOptions.InitialPos > 192 {
+				return fmt.Errorf("initial-pos must be between 0 and 192")
 			}
-
-			if len(args) >= 2 {
-				v, err := strconv.Atoi(args[1])
-				if err != nil {
-					return fmt.Errorf("invalid pressure value: %q", args[1])
-				}
-				if v < 1 || v > 255 {
-					return fmt.Errorf("pressure must be between 1 and 255")
-				}
-				pressure = v
+			if raceOptions.Pressure < 1 || raceOptions.Pressure > 255 {
+				return fmt.Errorf("pressure must be between 1 and 255")
 			}
-
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
-
-				cfg.AutoTrigger.Mode = 1
-				cfg.AutoTrigger.VibrationBind.TriggerParams = []int32{100, 1, 255, 70, 0}
-
-				for i := range cfg.AutoTrigger.MixedParams {
-					cfg.AutoTrigger.MixedParams[i] = 0
+				cfg.Mode = &pb.TriggerConfiguration_Race{
+					Race: &pb.TriggerRace{
+						InitialPos: int32(raceOptions.InitialPos),
+						Pressure:   int32(raceOptions.Pressure),
+					},
 				}
-				cfg.AutoTrigger.MixedParams[0] = int32(initialPos)
-				cfg.AutoTrigger.MixedParams[1] = int32(pressure)
-
-				lg := cfg.TriggerMotor.LineGear
-				lg.Type = 1
-				lg.Min = 90
-				lg.Max = 100
-				lg.Filter = 5
-				lg.VibrLimit = 1
-				lg.Scale = 100
-				lg.TimeLimit = 0
 			})
 		},
-	})
-	cmd.AddCommand(&cobra.Command{
+	}
+	raceCmd.Flags().IntVar(
+		&raceOptions.InitialPos,
+		"initial-pos",
+		0,
+		"Initial trigger position (0–192)",
+	)
+	raceCmd.Flags().IntVar(
+		&raceOptions.Pressure,
+		"pressure",
+		30,
+		"Trigger pressure (1–255)",
+	)
+	raceCmd.Flags().SortFlags = false
+	cmd.AddCommand(raceCmd)
+
+	recoilCmd := &cobra.Command{
 		Use:   "recoil",
 		Short: "Set this trigger to recoil mode",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			initialPos := 0      // 0-192
-			initialStrength := 1 // 1-255
-			intensity := 50      // 1-255
-			frequency := 15      // 1-255
-			onLeave := 1         // 0-1
+			if recoilOptions.InitialPos < 0 || recoilOptions.InitialPos > 192 {
+				return fmt.Errorf("start-pos must be between 0 and 192")
+			}
+			if recoilOptions.InitialStrength < 1 || recoilOptions.InitialStrength > 255 {
+				return fmt.Errorf("initial-strength must be between 1 and 255")
+			}
+			if recoilOptions.Intensity < 1 || recoilOptions.Intensity > 255 {
+				return fmt.Errorf("intensity must be between 1 and 255")
+			}
+			if recoilOptions.Frequency < 1 || recoilOptions.Frequency > 255 {
+				return fmt.Errorf("frequency must be between 1 and 255")
+			}
 
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
-				cfg.AutoTrigger.Mode = 2
-				cfg.AutoTrigger.VibrationBind.Type = 0
-				cfg.AutoTrigger.VibrationBind.MinFilter = 10
-				cfg.AutoTrigger.VibrationBind.Scale = 50
-				cfg.AutoTrigger.VibrationBind.TriggerParams =
-					[]int32{100, 1, 255, 70, 0}
-
-				cfg.AutoTrigger.MixedBorder = 0
-				cfg.AutoTrigger.MixedParams = []int32{
-					int32(initialPos), int32(initialStrength), int32(intensity), int32(frequency), int32(onLeave),
-					0, 0, 0, 0, 0,
+				cfg.Mode = &pb.TriggerConfiguration_Recoil{
+					Recoil: &pb.TriggerRecoil{
+						InitialPos:      int32(recoilOptions.InitialPos),
+						InitialStrength: int32(recoilOptions.InitialStrength),
+						Intensity:       int32(recoilOptions.Intensity),
+						Frequency:       int32(recoilOptions.Frequency),
+						InputAfter:      recoilOptions.InputAfter,
+					},
 				}
-
-				lg := cfg.TriggerMotor.LineGear
-				lg.Type = 1
-				lg.Min = 30
-				lg.Max = 80
-				lg.Filter = 5
-				lg.VibrLimit = 1
-				lg.Scale = 50
-				lg.TimeLimit = 0
 			})
 		},
-	})
-	cmd.AddCommand(&cobra.Command{
+	}
+	recoilCmd.Flags().IntVar(
+		&recoilOptions.InitialPos,
+		"start-pos",
+		0,
+		"Vibration start position (0–192)",
+	)
+	recoilCmd.Flags().IntVar(
+		&recoilOptions.InitialStrength,
+		"initial-strength",
+		1,
+		"Initial recoil strength (1–255)",
+	)
+	recoilCmd.Flags().IntVar(
+		&recoilOptions.Intensity,
+		"intensity",
+		50,
+		"Recoil intensity (1–255). Force required to trigger vibration once the trigger reaches the start position",
+	)
+	recoilCmd.Flags().IntVar(
+		&recoilOptions.Frequency,
+		"frequency",
+		15,
+		"Recoil frequency (1–255)",
+	)
+	recoilCmd.Flags().BoolVar(
+		&recoilOptions.InputAfter,
+		"input-after",
+		true,
+		"Only triggers the input after the start position",
+	)
+	cmd.AddCommand(recoilCmd)
+	recoilCmd.Flags().SortFlags = false
+
+	sniperCmd := &cobra.Command{
 		Use:   "sniper",
 		Short: "Set this trigger to sniper mode",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			initialPos := 50 // 0-192
-			length := 30     // 1-255
-			pressure := 1    // 1-255
-			onLeave := 1     // 0-1
+			if sniperOptions.InitialPos < 0 || sniperOptions.InitialPos > 192 {
+				return fmt.Errorf("initial-pos must be between 0 and 192")
+			}
+			if sniperOptions.Length < 1 || sniperOptions.Length > 255 {
+				return fmt.Errorf("length must be between 1 and 255")
+			}
+			if sniperOptions.Pressure < 1 || sniperOptions.Pressure > 255 {
+				return fmt.Errorf("pressure must be between 1 and 255")
+			}
 
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
-				cfg.AutoTrigger.Mode = 3
-				cfg.AutoTrigger.VibrationBind.Type = 0
-				cfg.AutoTrigger.VibrationBind.MinFilter = 10
-				cfg.AutoTrigger.VibrationBind.Scale = 50
-				cfg.AutoTrigger.VibrationBind.TriggerParams =
-					[]int32{100, 1, 255, 70, 0}
-
-				cfg.AutoTrigger.MixedBorder = 0
-				cfg.AutoTrigger.MixedParams = []int32{
-					int32(initialPos), int32(length), int32(pressure), 0, int32(onLeave),
-					0, 0, 0, 0, 0,
+				cfg.Mode = &pb.TriggerConfiguration_Sniper{
+					Sniper: &pb.TriggerSniper{
+						InitialPos: int32(sniperOptions.InitialPos),
+						Length:     int32(sniperOptions.Length),
+						Pressure:   int32(sniperOptions.Pressure),
+						InputAfter: sniperOptions.InputAfter,
+					},
 				}
-
-				lg := cfg.TriggerMotor.LineGear
-				lg.Type = 1
-				lg.Min = 30
-				lg.Max = 80
-				lg.Filter = 5
-				lg.VibrLimit = 1
-				lg.Scale = 50
-				lg.TimeLimit = 0
 			})
 		},
-	})
-	cmd.AddCommand(&cobra.Command{
-		Use:   "lock <position:20-200>",
+	}
+	sniperCmd.Flags().IntVar(
+		&sniperOptions.InitialPos,
+		"initial-pos",
+		50,
+		"Initial trigger position (0–192)",
+	)
+	sniperCmd.Flags().IntVar(
+		&sniperOptions.Length,
+		"length",
+		30,
+		"trigger length (1–255)",
+	)
+	sniperCmd.Flags().IntVar(
+		&sniperOptions.Pressure,
+		"pressure",
+		1,
+		"Trigger pressure (1–255)",
+	)
+	sniperCmd.Flags().BoolVar(
+		&sniperOptions.InputAfter,
+		"input-after",
+		true,
+		"Only triggers the input after the start position",
+	)
+	sniperCmd.Flags().SortFlags = false
+	cmd.AddCommand(sniperCmd)
+
+	lockCmd := &cobra.Command{
+		Use:   "lock",
 		Short: "Set this trigger to lock mode",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			initialPos := 40 // 20-200
+			if lockOptions.InitialPos < 0 || lockOptions.InitialPos > 192 {
+				return fmt.Errorf("initial-pos must be between 0 and 192")
+			}
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
-				cfg.AutoTrigger.Mode = 4
-				cfg.AutoTrigger.VibrationBind.Type = 0
-				cfg.AutoTrigger.VibrationBind.MinFilter = 10
-				cfg.AutoTrigger.VibrationBind.Scale = 50
-				cfg.AutoTrigger.VibrationBind.TriggerParams =
-					[]int32{100, 1, 255, 70, 0}
-
-				cfg.AutoTrigger.MixedBorder = 0
-				cfg.AutoTrigger.MixedParams = []int32{
-					int32(initialPos), 255, 1, 0, 0,
-					0, 0, 0, 0, 0,
+				cfg.Mode = &pb.TriggerConfiguration_Lock{
+					Lock: &pb.TriggerLock{
+						InitialPos: int32(lockOptions.InitialPos),
+					},
 				}
-
-				lg := cfg.TriggerMotor.LineGear
-				lg.Type = 1
-				lg.Min = 30
-				lg.Max = 80
-				lg.Filter = 5
-				lg.VibrLimit = 1
-				lg.Scale = 50
-				lg.TimeLimit = 0
 			})
 		},
-	})
-	cmd.AddCommand(&cobra.Command{
+	}
+	lockCmd.Flags().IntVar(
+		&lockOptions.InitialPos,
+		"initial-pos",
+		40,
+		"Initial trigger position (0–192)",
+	)
+	lockCmd.Flags().SortFlags = false
+	cmd.AddCommand(lockCmd)
+
+	vibrationCmd := &cobra.Command{
 		Use:   "vibration",
 		Short: "Set this trigger to vibration mode",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			coefficient := 50 // 0 - 200
-			threshold := 10   // 1 - 255
-			travelRange := 20 // 0 - 200
-			frequency := 90   // 0 - 200
-
-			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
-				cfg := side.GetBean(conf)
-				cfg.AutoTrigger.Mode = 5
-				cfg.AutoTrigger.VibrationBind.Type = 2
-				cfg.AutoTrigger.VibrationBind.MinFilter = int32(threshold)
-				cfg.AutoTrigger.VibrationBind.Scale = int32(coefficient)
-				cfg.AutoTrigger.VibrationBind.TriggerParams =
-					[]int32{int32(travelRange), 1, 1, int32(frequency), 0}
-
-				cfg.AutoTrigger.MixedBorder = 0
-				cfg.AutoTrigger.MixedParams = []int32{
-					1, 1, 1, 90, 0,
-					0, 0, 0, 0, 0,
-				}
-
-				lg := cfg.TriggerMotor.LineGear
-				lg.Type = 1
-				lg.Min = 30
-				lg.Max = 80
-				lg.Filter = 5
-				lg.VibrLimit = 1
-				lg.Scale = 50
-				lg.TimeLimit = 0
-			})
-		},
-	})
-	cmd.AddCommand(&cobra.Command{
-		Use:   "custom <path>",
-		Short: "Load custom trigger configuration from JSON file",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			path := args[0]
-
-			info, err := os.Stat(path)
-			if err != nil {
-				if os.IsNotExist(err) {
-					return fmt.Errorf("file does not exist: %s", path)
-				}
-				return fmt.Errorf("cannot access file %s: %w", path, err)
+			if vibrationOptions.Coefficient < 0 || vibrationOptions.Coefficient > 200 {
+				return fmt.Errorf("intensity must be between 0 and 200")
 			}
-
-			if info.IsDir() {
-				return fmt.Errorf("path is a directory, not a file: %s", path)
+			if vibrationOptions.Threshold < 1 || vibrationOptions.Threshold > 255 {
+				return fmt.Errorf("threshold must be between 1 and 255")
 			}
-
-			if filepath.Ext(path) != ".json" {
-				return fmt.Errorf("expected a .json file: %s", path)
+			if vibrationOptions.TravelRange < 1 || vibrationOptions.TravelRange > 200 {
+				return fmt.Errorf("range must be between 1 and 200")
+			}
+			if vibrationOptions.Frequency < 1 || vibrationOptions.Frequency > 255 {
+				return fmt.Errorf("frequency must be between 1 and 255")
 			}
 
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
-				jsonCfg, err := loadTriggerJSON(path)
-				if err != nil {
-					panic(err)
+				cfg.Mode = &pb.TriggerConfiguration_Vibration{
+					Vibration: &pb.TriggerVibration{
+						Coefficient: int32(vibrationOptions.Coefficient),
+						Threshold:   int32(vibrationOptions.Threshold),
+						TravelRange: int32(vibrationOptions.TravelRange),
+						Frequency:   int32(vibrationOptions.Frequency),
+					},
 				}
-				applyTriggerJSON(cfg, jsonCfg)
 			})
 		},
-	})
+	}
+	vibrationCmd.Flags().IntVar(
+		&vibrationOptions.Coefficient,
+		"intensity",
+		50,
+		"Intensity of the trigger (0–200)",
+	)
+	vibrationCmd.Flags().IntVar(
+		&vibrationOptions.Threshold,
+		"threshold",
+		10,
+		"Vibration threshold (1–255). Below this value, the trigger will not vibrate.",
+	)
+	vibrationCmd.Flags().IntVar(
+		&vibrationOptions.TravelRange,
+		"range",
+		20,
+		"Trigger travel range for sustained vibration feedback (1-200)",
+	)
+	vibrationCmd.Flags().IntVar(
+		&vibrationOptions.Frequency,
+		"frequency",
+		90,
+		"Vibration frequency (1-255)",
+	)
+	vibrationCmd.Flags().SortFlags = false
+	cmd.AddCommand(vibrationCmd)
 
 	return cmd
 }
@@ -467,6 +401,19 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 func init() {
 	var triggerLeftCommand = genTriggerCommand(triggerLeft)
 	var triggerRightCommand = genTriggerCommand(triggerRight)
+
+	triggerLeftCommand.Flags().BoolVar(
+		&showDetails,
+		"details",
+		false,
+		"Show detailed trigger configuration",
+	)
+	triggerRightCommand.Flags().BoolVar(
+		&showDetails,
+		"details",
+		false,
+		"Show detailed trigger configuration",
+	)
 
 	triggerCommand.AddCommand(triggerLeftCommand)
 	triggerCommand.AddCommand(triggerRightCommand)
