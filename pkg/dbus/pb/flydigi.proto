@@ -20,10 +20,47 @@ message GamepadInfo {
 message GamepadConfiguration {
     JoystickConfiguration left_joystick = 1;
     JoystickConfiguration right_joystick = 2;
+
+    TriggerConfiguration left_trigger = 3;
+    TriggerConfiguration right_trigger = 4;
 }
 
 message JoystickConfiguration {
     int32 deadzone = 1;
+}
+
+message VibrationBind {
+    int32 type = 1;
+    int32 minFilter = 2;
+    int32 scale = 3;
+    repeated int32 triggerParams = 4;
+}
+
+message TriggerConfiguration {
+    AutoTrigger autoTrigger = 1;
+	TriggerMotor triggerMotor = 2;
+}
+
+message AutoTrigger {
+    int32 mode = 1;
+    VibrationBind vibrationBind = 2;
+    int32 mixedBorder = 3;
+	repeated int32 mixedParams = 4;
+}
+
+message TriggerMotor {
+    TriggerMotorSet lineGear = 1;
+    TriggerMotorSet micrGear = 2;
+}
+
+message TriggerMotorSet {
+    int32 type = 1;
+	int32 min = 2;
+	int32 max = 3;
+	int32 filter = 4;
+	int32 vibrLimit = 5;
+	int32 scale = 6;
+	int32 timeLimit = 7;
 }
 
 message LedsOff {
@@ -37,12 +74,18 @@ message LedsStreamlined {
     float speed = 1;
 }
 
+message LedsGradient {
+    float speed = 1;
+    repeated Color colors = 2;
+}
+
 message LedsConfiguration {
     float brightness = 1;
     oneof leds {
         LedsOff off = 10;
         LedsSteady steady = 12;
         LedsStreamlined streamlined = 13;
+        LedsGradient gradient = 15;
     }
 }
 

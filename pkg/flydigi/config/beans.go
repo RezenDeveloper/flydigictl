@@ -95,6 +95,57 @@ func (b *NewLedConfigBean) SetStreamlined(speed float32) {
 	b.LedGroups = getLedGroupList(0, 5)
 }
 
+func interpolateGradient(colors []LedUnit, t float32) LedUnit {
+	if len(colors) == 0 {
+		return LedUnit{}
+	}
+	if len(colors) == 1 {
+		return colors[0]
+	}
+
+	pos := t * float32(len(colors)-1)
+	i := int(pos)
+	f := pos - float32(i)
+
+	c1 := colors[i]
+	c2 := colors[min(i+1, len(colors)-1)]
+
+	return LedUnit{
+		R: uint8(float32(c1.R)*(1-f) + float32(c2.R)*f),
+		G: uint8(float32(c1.G)*(1-f) + float32(c2.G)*f),
+		B: uint8(float32(c1.B)*(1-f) + float32(c2.B)*f),
+	}
+}
+
+func (b *NewLedConfigBean) SetGradient(colors []LedUnit, speed float32) {
+	const ledCount = 10
+	const groupCount = 16
+
+	b.LedMode = LedModeGradient
+	b.Loop_time = 100 - byte(speed*100)
+	b.Rgb_num = ledCount
+	b.Loop_End = ledCount - 1
+	b.Type = 0
+
+	b.LedGroups = utils.RepeatFunc(func() *LedGroup {
+		return &LedGroup{
+			Units: utils.RepeatFunc(func() *LedUnit {
+				return &LedUnit{}
+			}, ledCount),
+		}
+	}, groupCount)
+
+	for i := 0; i < ledCount; i++ {
+		t := float32(i) / float32(ledCount-1)
+
+		c := interpolateGradient(colors, t)
+
+		for g := 0; g < groupCount; g++ {
+			b.LedGroups[g].Units[i] = &c
+		}
+	}
+}
+
 type LedGroup struct {
 	Units []*LedUnit
 }
@@ -237,6 +288,145 @@ type Trigger struct {
 	Curve        *Curve
 	AutoTrigger  *Autotrigger
 	TriggerMotor *TriggerMotor
+}
+
+func (t *Trigger) ApplyDefaultTrigger() {
+	t.Type = 0
+	t.AutoTrigger.Mode = 0
+	t.AutoTrigger.VibrationBind.TriggerParams = []int32{1, 10, 1, 90, 0}
+
+	for i := range t.AutoTrigger.MixedParams {
+		t.AutoTrigger.MixedParams[i] = 0
+	}
+
+	lg := t.TriggerMotor.LineGear
+	lg.Type = 1
+	lg.Min = 30
+	lg.Max = 80
+	lg.Filter = 5
+	lg.Vibrlimit = 1
+	lg.Scale = 50
+	lg.TimeLimit = 0
+}
+
+func (t *Trigger) ApplyRaceTrigger() {
+	t.Type = 0
+	t.AutoTrigger.Mode = 1
+	t.AutoTrigger.VibrationBind.TriggerParams = []int32{100, 1, 255, 70, 0}
+
+	for i := range t.AutoTrigger.MixedParams {
+		t.AutoTrigger.MixedParams[i] = 0
+	}
+	t.AutoTrigger.MixedParams[1] = 30
+
+	lg := t.TriggerMotor.LineGear
+	lg.Type = 1
+	lg.Min = 90
+	lg.Max = 100
+	lg.Filter = 5
+	lg.Vibrlimit = 1
+	lg.Scale = 100
+	lg.TimeLimit = 0
+}
+
+func (t *Trigger) ApplySniperTrigger() {
+	t.Type = 0
+	t.AutoTrigger.Mode = 3
+	t.AutoTrigger.VibrationBind.Type = 0
+	t.AutoTrigger.VibrationBind.MinFilter = 10
+	t.AutoTrigger.VibrationBind.Scale = 50
+	t.AutoTrigger.VibrationBind.TriggerParams =
+		[]int32{100, 1, 255, 70, 0}
+
+	t.AutoTrigger.MixedBorder = 0
+	t.AutoTrigger.MixedParams = []int32{
+		50, 30, 1, 0, 1,
+		0, 0, 0, 0, 0,
+	}
+
+	lg := t.TriggerMotor.LineGear
+	lg.Type = 1
+	lg.Min = 30
+	lg.Max = 80
+	lg.Filter = 5
+	lg.Vibrlimit = 1
+	lg.Scale = 50
+	lg.TimeLimit = 0
+}
+
+func (t *Trigger) ApplyRecoilTrigger() {
+	t.Type = 0
+	t.AutoTrigger.Mode = 2
+	t.AutoTrigger.VibrationBind.Type = 0
+	t.AutoTrigger.VibrationBind.MinFilter = 10
+	t.AutoTrigger.VibrationBind.Scale = 50
+	t.AutoTrigger.VibrationBind.TriggerParams =
+		[]int32{100, 1, 255, 70, 0}
+
+	t.AutoTrigger.MixedBorder = 0
+	t.AutoTrigger.MixedParams = []int32{
+		0, 1, 50, 15, 1,
+		0, 0, 0, 0, 0,
+	}
+
+	lg := t.TriggerMotor.LineGear
+	lg.Type = 1
+	lg.Min = 30
+	lg.Max = 80
+	lg.Filter = 5
+	lg.Vibrlimit = 1
+	lg.Scale = 50
+	lg.TimeLimit = 0
+}
+
+func (t *Trigger) ApplyLockTrigger() {
+	t.Type = 0
+	t.AutoTrigger.Mode = 4
+	t.AutoTrigger.VibrationBind.Type = 0
+	t.AutoTrigger.VibrationBind.MinFilter = 10
+	t.AutoTrigger.VibrationBind.Scale = 50
+	t.AutoTrigger.VibrationBind.TriggerParams =
+		[]int32{100, 1, 255, 70, 0}
+
+	t.AutoTrigger.MixedBorder = 0
+	t.AutoTrigger.MixedParams = []int32{
+		40, 250, 1, 0, 0,
+		0, 0, 0, 0, 0,
+	}
+
+	lg := t.TriggerMotor.LineGear
+	lg.Type = 1
+	lg.Min = 30
+	lg.Max = 80
+	lg.Filter = 5
+	lg.Vibrlimit = 1
+	lg.Scale = 50
+	lg.TimeLimit = 0
+}
+
+func (t *Trigger) ApplyVibrationTrigger() {
+	t.Type = 0
+	t.AutoTrigger.Mode = 5
+	t.AutoTrigger.VibrationBind.Type = 2
+	t.AutoTrigger.VibrationBind.MinFilter = 10
+	t.AutoTrigger.VibrationBind.Scale = 50
+	t.AutoTrigger.VibrationBind.TriggerParams =
+		[]int32{1, 1, 1, 90, 0}
+
+	t.AutoTrigger.MixedBorder = 0
+	t.AutoTrigger.MixedParams = []int32{
+		1, 1, 1, 90, 0,
+		0, 0, 0, 0, 0,
+	}
+
+	lg := t.TriggerMotor.LineGear
+	lg.Type = 1
+	lg.Min = 30
+	lg.Max = 80
+	lg.Filter = 5
+	lg.Vibrlimit = 1
+	lg.Scale = 50
+	lg.TimeLimit = 0
 }
 
 type Autotrigger struct {
