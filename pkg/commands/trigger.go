@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/pipe01/flydigictl/pkg/dbus/pb"
 	"github.com/spf13/cobra"
@@ -232,19 +233,47 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		},
 	})
 	cmd.AddCommand(&cobra.Command{
-		Use:   "race",
+		Use:   "race <initial_pos:0-192> <pressure:1-255>",
 		Short: "Set this trigger to race mode",
-		Args:  cobra.NoArgs,
+		Args:  cobra.MaximumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			initialPos := 0 // 0-192
+			pressure := 30  // 1-255
+
+			if len(args) >= 1 {
+				v, err := strconv.Atoi(args[0])
+				if err != nil {
+					return fmt.Errorf("invalid start value: %q", args[0])
+				}
+				if v < 0 || v > 192 {
+					return fmt.Errorf("start must be between 0 and 192")
+				}
+				initialPos = v
+			}
+
+			if len(args) >= 2 {
+				v, err := strconv.Atoi(args[1])
+				if err != nil {
+					return fmt.Errorf("invalid pressure value: %q", args[1])
+				}
+				if v < 1 || v > 255 {
+					return fmt.Errorf("pressure must be between 1 and 255")
+				}
+				pressure = v
+			}
+
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
+
 				cfg.AutoTrigger.Mode = 1
 				cfg.AutoTrigger.VibrationBind.TriggerParams = []int32{100, 1, 255, 70, 0}
 
 				for i := range cfg.AutoTrigger.MixedParams {
 					cfg.AutoTrigger.MixedParams[i] = 0
 				}
-				cfg.AutoTrigger.MixedParams[1] = 30
+				cfg.AutoTrigger.MixedParams[0] = int32(initialPos)
+				cfg.AutoTrigger.MixedParams[1] = int32(pressure)
 
 				lg := cfg.TriggerMotor.LineGear
 				lg.Type = 1
@@ -262,6 +291,12 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		Short: "Set this trigger to recoil mode",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			initialPos := 0      // 0-192
+			initialStrength := 1 // 1-255
+			intensity := 50      // 1-255
+			frequency := 15      // 1-255
+			onLeave := 1         // 0-1
+
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
 				cfg.AutoTrigger.Mode = 2
@@ -273,7 +308,7 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 
 				cfg.AutoTrigger.MixedBorder = 0
 				cfg.AutoTrigger.MixedParams = []int32{
-					0, 1, 50, 15, 1,
+					int32(initialPos), int32(initialStrength), int32(intensity), int32(frequency), int32(onLeave),
 					0, 0, 0, 0, 0,
 				}
 
@@ -293,6 +328,11 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		Short: "Set this trigger to sniper mode",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			initialPos := 50 // 0-192
+			length := 30     // 1-255
+			pressure := 1    // 1-255
+			onLeave := 1     // 0-1
+
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
 				cfg.AutoTrigger.Mode = 3
@@ -304,7 +344,7 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 
 				cfg.AutoTrigger.MixedBorder = 0
 				cfg.AutoTrigger.MixedParams = []int32{
-					50, 30, 1, 0, 1,
+					int32(initialPos), int32(length), int32(pressure), 0, int32(onLeave),
 					0, 0, 0, 0, 0,
 				}
 
@@ -320,10 +360,11 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		},
 	})
 	cmd.AddCommand(&cobra.Command{
-		Use:   "lock",
+		Use:   "lock <position:20-200>",
 		Short: "Set this trigger to lock mode",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			initialPos := 40 // 20-200
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
 				cfg.AutoTrigger.Mode = 4
@@ -335,7 +376,7 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 
 				cfg.AutoTrigger.MixedBorder = 0
 				cfg.AutoTrigger.MixedParams = []int32{
-					40, 250, 1, 0, 0,
+					int32(initialPos), 255, 1, 0, 0,
 					0, 0, 0, 0, 0,
 				}
 
@@ -355,14 +396,19 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		Short: "Set this trigger to vibration mode",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			coefficient := 50 // 0 - 200
+			threshold := 10   // 1 - 255
+			travelRange := 20 // 0 - 200
+			frequency := 90   // 0 - 200
+
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
 				cfg.AutoTrigger.Mode = 5
 				cfg.AutoTrigger.VibrationBind.Type = 2
-				cfg.AutoTrigger.VibrationBind.MinFilter = 10
-				cfg.AutoTrigger.VibrationBind.Scale = 50
+				cfg.AutoTrigger.VibrationBind.MinFilter = int32(threshold)
+				cfg.AutoTrigger.VibrationBind.Scale = int32(coefficient)
 				cfg.AutoTrigger.VibrationBind.TriggerParams =
-					[]int32{1, 1, 1, 90, 0}
+					[]int32{int32(travelRange), 1, 1, int32(frequency), 0}
 
 				cfg.AutoTrigger.MixedBorder = 0
 				cfg.AutoTrigger.MixedParams = []int32{
