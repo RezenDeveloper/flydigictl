@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/pipe01/flydigictl/pkg/dbus/pb"
 	"github.com/spf13/cobra"
@@ -16,21 +17,8 @@ const (
 	triggerRight triggerSide = "right"
 )
 
-func (s triggerSide) GetBean(b *pb.GamepadConfiguration) *pb.TriggerConfiguration {
-	switch s {
-	case triggerLeft:
-		return b.LeftTrigger
-	case triggerRight:
-		return b.RightTrigger
-	}
-	panic("invalid trigger side")
-}
-
-var triggerCommand = &cobra.Command{
-	Use:   "trigger",
-	Short: "Configure triggers (Apex 4)",
-}
 var showDetails bool
+var skipValidation bool
 
 var raceOptions struct {
 	InitialPos int
@@ -62,10 +50,48 @@ var vibrationOptions struct {
 	Frequency   int
 }
 
+func (s triggerSide) GetBean(b *pb.GamepadConfiguration) *pb.TriggerConfiguration {
+	switch s {
+	case triggerLeft:
+		return b.LeftTrigger
+	case triggerRight:
+		return b.RightTrigger
+	}
+	panic("invalid trigger side")
+}
+
+func ValidateTrigger(cmd *cobra.Command, args []string) error {
+	validIds := []int32{84}
+
+	if skipValidation {
+		return nil
+	}
+
+	return useConnection(func() error {
+		info, err := dbusClient.GetDeviceInfo()
+
+		if err != nil {
+			return fmt.Errorf("get device info: %w", err)
+		}
+
+		if slices.Contains(validIds, info.DeviceId) == false {
+			return fmt.Errorf("Trigger not supported for this device")
+		}
+
+		return nil
+	})
+}
+
+var triggerCommand = &cobra.Command{
+	Use:   "trigger",
+	Short: "Configure triggers (Apex 4)",
+}
+
 func genTriggerCommand(side triggerSide) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   string(side),
-		Short: fmt.Sprintf("Manage %s trigger configuration", side),
+		Use:     string(side),
+		Short:   fmt.Sprintf("Manage %s trigger configuration", side),
+		PreRunE: ValidateTrigger,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := readConfiguration(func(conf *pb.GamepadConfiguration) *pb.TriggerConfiguration {
 				return side.GetBean(conf)
@@ -75,6 +101,14 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 			}
 
 			switch mode := cfg.Mode.(type) {
+			case *pb.TriggerConfiguration_Default:
+				if terseOutput {
+					fmt.Print("default")
+					return nil
+				}
+
+				fmt.Printf("%s trigger mode: Default\n", cases.Title(language.English, cases.NoLower).String(string(side)))
+
 			case *pb.TriggerConfiguration_Race:
 
 				if terseOutput {
@@ -82,7 +116,7 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 					return nil
 				}
 
-				fmt.Printf("%s trigger mode: Race", side)
+				fmt.Printf("%s trigger mode: Race\n", cases.Title(language.English, cases.NoLower).String(string(side)))
 
 				if showDetails {
 					fmt.Printf("  %-22s : %v\n", "Initial position", mode.Race.InitialPos)
@@ -94,7 +128,7 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 					return nil
 				}
 
-				fmt.Printf("%s trigger mode: Race\n", cases.Title(language.English, cases.NoLower).String(string(side)))
+				fmt.Printf("%s trigger mode: Recoil\n", cases.Title(language.English, cases.NoLower).String(string(side)))
 				if showDetails {
 					fmt.Printf("  %-22s : %v\n", "Initial position", mode.Recoil.InitialPos)
 					fmt.Printf("  %-22s : %v\n", "Initial strength", mode.Recoil.InitialStrength)
@@ -135,6 +169,12 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 					fmt.Printf("  %-22s : %v\n", "Travel range", mode.Vibration.TravelRange)
 					fmt.Printf("  %-22s : %v\n", "Frequency", mode.Vibration.Frequency)
 				}
+			default:
+				if terseOutput {
+					fmt.Println("unknown")
+					return nil
+				}
+				fmt.Printf("%s trigger mode: Unknown\n", cases.Title(language.English, cases.NoLower).String(string(side)))
 			}
 
 			return nil
@@ -142,9 +182,10 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 	}
 
 	cmd.AddCommand(&cobra.Command{
-		Use:   "default",
-		Short: "Set this trigger to default mode",
-		Args:  cobra.NoArgs,
+		Use:     "default",
+		Short:   "Set this trigger to default mode",
+		Args:    cobra.NoArgs,
+		PreRunE: ValidateTrigger,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return modifyConfiguration(func(conf *pb.GamepadConfiguration) {
 				cfg := side.GetBean(conf)
@@ -154,9 +195,10 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 	})
 
 	raceCmd := &cobra.Command{
-		Use:   "race",
-		Short: "Set this trigger to race mode",
-		Args:  cobra.NoArgs,
+		Use:     "race",
+		Short:   "Set this trigger to race mode",
+		Args:    cobra.NoArgs,
+		PreRunE: ValidateTrigger,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if raceOptions.InitialPos < 0 || raceOptions.InitialPos > 192 {
 				return fmt.Errorf("initial-pos must be between 0 and 192")
@@ -191,9 +233,10 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 	cmd.AddCommand(raceCmd)
 
 	recoilCmd := &cobra.Command{
-		Use:   "recoil",
-		Short: "Set this trigger to recoil mode",
-		Args:  cobra.NoArgs,
+		Use:     "recoil",
+		Short:   "Set this trigger to recoil mode",
+		Args:    cobra.NoArgs,
+		PreRunE: ValidateTrigger,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if recoilOptions.InitialPos < 0 || recoilOptions.InitialPos > 192 {
 				return fmt.Errorf("start-pos must be between 0 and 192")
@@ -256,9 +299,10 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 	recoilCmd.Flags().SortFlags = false
 
 	sniperCmd := &cobra.Command{
-		Use:   "sniper",
-		Short: "Set this trigger to sniper mode",
-		Args:  cobra.NoArgs,
+		Use:     "sniper",
+		Short:   "Set this trigger to sniper mode",
+		Args:    cobra.NoArgs,
+		PreRunE: ValidateTrigger,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if sniperOptions.InitialPos < 0 || sniperOptions.InitialPos > 192 {
 				return fmt.Errorf("initial-pos must be between 0 and 192")
@@ -311,9 +355,10 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 	cmd.AddCommand(sniperCmd)
 
 	lockCmd := &cobra.Command{
-		Use:   "lock",
-		Short: "Set this trigger to lock mode",
-		Args:  cobra.NoArgs,
+		Use:     "lock",
+		Short:   "Set this trigger to lock mode",
+		Args:    cobra.NoArgs,
+		PreRunE: ValidateTrigger,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if lockOptions.InitialPos < 0 || lockOptions.InitialPos > 192 {
 				return fmt.Errorf("initial-pos must be between 0 and 192")
@@ -338,9 +383,10 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 	cmd.AddCommand(lockCmd)
 
 	vibrationCmd := &cobra.Command{
-		Use:   "vibration",
-		Short: "Set this trigger to vibration mode",
-		Args:  cobra.NoArgs,
+		Use:     "vibration",
+		Short:   "Set this trigger to vibration mode",
+		Args:    cobra.NoArgs,
+		PreRunE: ValidateTrigger,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if vibrationOptions.Coefficient < 0 || vibrationOptions.Coefficient > 200 {
 				return fmt.Errorf("intensity must be between 0 and 200")
@@ -413,6 +459,18 @@ func init() {
 		"details",
 		false,
 		"Show detailed trigger configuration",
+	)
+	triggerLeftCommand.PersistentFlags().BoolVar(
+		&skipValidation,
+		"dangerous-skip",
+		false,
+		"Skips the trigger device validation. Only use it if you are sure the device has adaptive triggers",
+	)
+	triggerRightCommand.PersistentFlags().BoolVar(
+		&skipValidation,
+		"dangerous-skip",
+		false,
+		"Skips the trigger device validation. Only use it if you are sure the device has adaptive triggers",
 	)
 
 	triggerCommand.AddCommand(triggerLeftCommand)
