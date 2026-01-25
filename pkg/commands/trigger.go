@@ -298,7 +298,7 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		&recoilOptions.InputAfter,
 		"input-after",
 		true,
-		"Only triggers the input after the start position",
+		"Only triggers the input after start position",
 	)
 	cmd.AddCommand(recoilCmd)
 	recoilCmd.Flags().SortFlags = false
@@ -342,7 +342,7 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		&sniperOptions.Length,
 		"length",
 		30,
-		"trigger length (1–255)",
+		"Trigger length (1–255)",
 	)
 	sniperCmd.Flags().IntVar(
 		&sniperOptions.Pressure,
@@ -354,7 +354,7 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		&sniperOptions.InputAfter,
 		"input-after",
 		true,
-		"Only triggers the input after the start position",
+		"Only triggers the input after start position",
 	)
 	sniperCmd.Flags().SortFlags = false
 	cmd.AddCommand(sniperCmd)
@@ -382,7 +382,7 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		&lockOptions.InitialPos,
 		"initial-pos",
 		40,
-		"Initial trigger position (0–192)",
+		"Lock start position (0–192)",
 	)
 	lockCmd.Flags().SortFlags = false
 	cmd.AddCommand(lockCmd)
@@ -423,13 +423,13 @@ func genTriggerCommand(side triggerSide) *cobra.Command {
 		&vibrationOptions.Coefficient,
 		"intensity",
 		50,
-		"Intensity of the trigger (0–200)",
+		"Vibration intensity (0–200)",
 	)
 	vibrationCmd.Flags().IntVar(
 		&vibrationOptions.Threshold,
 		"threshold",
 		10,
-		"Vibration threshold (1–255). Below this value, the trigger will not vibrate.",
+		"Vibration threshold, below this value no vibration occurs (1–255)",
 	)
 	vibrationCmd.Flags().IntVar(
 		&vibrationOptions.TravelRange,
