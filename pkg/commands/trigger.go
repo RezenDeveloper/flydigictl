@@ -67,7 +67,10 @@ func ValidateTrigger(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	return useConnection(func() error {
+	var startPersist = persistConnection
+
+	var response = useConnection(func() error {
+		persistConnection = true
 		info, err := dbusClient.GetDeviceInfo()
 
 		if err != nil {
@@ -80,6 +83,8 @@ func ValidateTrigger(cmd *cobra.Command, args []string) error {
 
 		return nil
 	})
+	persistConnection = startPersist
+	return response
 }
 
 var triggerCommand = &cobra.Command{
